@@ -1,39 +1,39 @@
-const { Thought } = require('../models');
+const { saveBook } = require('../controllers/user-controller');
+const { User, Book } = require('../models');
  
 const resolvers = {
   Query: {
-    thoughts: async () => {
-      return Thought.find().sort({ createdAt: -1 });
+    users: async () => {
+      return User.find().sort({ createdAt: -1 });
     },
 
-    thought: async (parent, { thoughtId }) => {
-      return Thought.findOne({ _id: thoughtId });
+    books: async () => {
+      return Book.find().sort({ createdAt: -1 });
+    },
+
+    user: async (parent, { userId }) => {
+      return User.findOne({ _id: userId });
+    },
+
+    book: async () => (parent, { bookId }) => {
+      return Book.findOne({ _id: bookId });
     },
   },
 
   Mutation: {
-    addThought: async (parent, { thoughtText, thoughtAuthor }) => {
-      return Thought.create({ thoughtText, thoughtAuthor });
+    addUser: async (parent, { username, email, password, savedBooks }) => {
+      return User.create({ username, email, password, savedBooks });
     },
-    addComment: async (parent, { thoughtId, commentText }) => {
+    addBook: async (parent, { authors, description, bookId, image, link, title }) => {
+      return Book.create({ authors, description, bookId, image, link, title });
+    },
+    removeUser: async (parent, { userId }) => {
+      return Thought.findOneAndDelete({ _id: userId });
+    },
+    removeBook: async (parent, { bookId }) => {
       return Thought.findOneAndUpdate(
-        { _id: thoughtId },
-        {
-          $addToSet: { comments: { commentText } },
-        },
-        {
-          new: true,
-          runValidators: true,
-        }
-      );
-    },
-    removeThought: async (parent, { thoughtId }) => {
-      return Thought.findOneAndDelete({ _id: thoughtId });
-    },
-    removeComment: async (parent, { thoughtId, commentId }) => {
-      return Thought.findOneAndUpdate(
-        { _id: thoughtId },
-        { $pull: { comments: { _id: commentId } } },
+        { _id: bookId },
+        { $pull: { savedBooks: { _id: bookId } } },
         { new: true }
       );
     },

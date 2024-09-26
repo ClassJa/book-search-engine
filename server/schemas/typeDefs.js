@@ -20,7 +20,7 @@ const typeDefs = `
   type Query {
     users: [User]!
     user(userId: ID!): User
-    book: [Book]!
+    books: [Book]!
     book(bookId: ID!): Book
   }
 
